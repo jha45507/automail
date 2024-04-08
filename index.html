@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <iframe id="googleForm"
+        src="https://docs.google.com/forms/d/e/1FAIpQLSfBARGUR-bl7HrCNj5vCOj93kyDTJG2SgUwc3O05RAMAtR7Qg/viewform?embedded=true"
+        width="100%" height="912">
+        Loading…
+    </iframe>
+    <script>
+        window.addEventListener('message', function (event) {
+            if (event.origin !== 'https://docs.google.com') return; // Ensure message is from the Google Form
+            if (event.data === 'GoogleFormSubmitted') {
+                console.log('Google Form Submitted!');
+                // Add your tracking code here
+            }
+        });
+
+        function receiveFormSubmission(formData) {
+            console.log('Form submission received:', formData);
+            // Add your tracking code here
+        }
+    </script>
+
+</body>
+
+</html>
