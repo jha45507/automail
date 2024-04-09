@@ -38,7 +38,7 @@ cron.schedule('*/30 * * * * *', async () => {
             let headersList = {
                 "Content-Type": "application/json"
                }
-            let response = await fetch("https://main--automailsender.netlify.app/api/mail/", { 
+            let response = await fetch("https://automailsender.netlify.app/api/mail/", { 
                 method: "POST",
                 body: JSON.stringify(body),
                 headers: headersList
