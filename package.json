@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "server": "next start",
+    "start": "npm-run-all --parallel server cron",
+    "cron": "node cronRun.js",
     "lint": "next lint"
   },
   "dependencies": {

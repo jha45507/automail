@@ -1,9 +1,10 @@
 const cron = require('node-cron');
 let global = [{}];
 cron.schedule('*/30 * * * * *', async () => {
+    console.log("this")
     let arr = ['Timestamp', 'Name', 'Email', 'Description', 'Contact'];
     try {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbyaeJoFaoAj3ULpB0f2G-ug_A-3zB-xB9Nt_abuliUz5B2VUbW52Mpf0hQWPOIjjhyalA/exec');
+        const response = await fetch('https://script.google.com/macros/s/AKfycbyuFXkKVrzep-DN2TDnAlNHOmiWczfyVFc2HMRbIlgus8SU0ls_6wvPse65CzQaMkUCuA/exec');
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -32,26 +33,46 @@ cron.schedule('*/30 * * * * *', async () => {
         //     }, []);
         //     global.push(uniqueObjects)
         // }
+        const post = async (body) => { 
+          try {
+            let headersList = {
+                "Content-Type": "application/json"
+               }
+            let response = await fetch("https://main--automailsender.netlify.app/api/mail/", { 
+                method: "POST",
+                body: JSON.stringify(body),
+                headers: headersList
+                });
+        
+                let data = await response.text();
+                console.log(data);
+          } catch (error) {
+            console.log(error)
+          }
+         }
+         
         for (let k in formateData) {
             const postData = formateData[k];
             let userEmail = { Email: postData.Email }
-           let haveMain = global.filter((i) => i.Email == postData.Email )
+            let haveMain = global.filter((i) => i.Email == postData.Email)
 
             if (haveMain.length == 0 || haveMain[0].Email !== postData.Email) {
-                fetch('http://localhost:3000/api/mail', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(postData),
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Response from backend:', data);
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
+                // fetch("https://main--automailsender.netlify.app/api/mail/", {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //     },
+                //     body: JSON.stringify(postData),
+                // })
+                //     .then(response => response.json())
+                //     .then(data => {
+                //         console.log('Response from backend:', data);
+                //     })
+                //     .catch(error => {
+                //         console.error('Error:', error);
+                //     });
+
+                post(postData);
                 global.push(userEmail)
             }
         }
@@ -62,3 +83,4 @@ cron.schedule('*/30 * * * * *', async () => {
 // export default function handler(req, res) {
 //     res.status(200).end();
 // }
+
