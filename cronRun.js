@@ -1,15 +1,12 @@
 const cron = require('node-cron');
+const axios = require('axios');
 let global = [{}];
 cron.schedule('*/30 * * * * *', async () => {
-    console.log("this")
-    let arr = ['Timestamp', 'Name', 'Email', 'Description', 'Contact'];
+    let arr = ["Timestamp", "Name", "Email", "Description", "Contact"];
+    let url = 'https://script.google.com/macros/s/AKfycbyuFXkKVrzep-DN2TDnAlNHOmiWczfyVFc2HMRbIlgus8SU0ls_6wvPse65CzQaMkUCuA/exec'
     try {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbyuFXkKVrzep-DN2TDnAlNHOmiWczfyVFc2HMRbIlgus8SU0ls_6wvPse65CzQaMkUCuA/exec');
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        let result = await response.json();
-        result = result.content;
+        const response = await axios.get(url);
+        const result = response.data.content;
         let formateData = []
         result.unshift(arr)
         for (let i = 1; i < result.length; i++) {
@@ -20,67 +17,19 @@ cron.schedule('*/30 * * * * *', async () => {
             }
             formateData.push(obj);
         }
-        // if (global.length === 0) {
-        //     global.push(global)
-        // }
-        // else {
-        //     const uniqueObjects = global.reduce((acc, current) => {
-        //         const existingObject = acc.find(obj => obj.Email === current.Email);
-        //         if (!existingObject) {
-        //             return acc.concat(current);
-        //         }
-        //         return acc;
-        //     }, []);
-        //     global.push(uniqueObjects)
-        // }
-        const post = async (body) => { 
-          try {
-            let headersList = {
-                "Content-Type": "application/json"
-               }
-            let response = await fetch("https://automailsender.netlify.app/api/mail/", { 
-                method: "POST",
-                body: JSON.stringify(body),
-                headers: headersList
-                });
-        
-                let data = await response.text();
-                console.log(data);
-          } catch (error) {
-            console.log(error)
-          }
-         }
-         
         for (let k in formateData) {
             const postData = formateData[k];
             let userEmail = { Email: postData.Email }
             let haveMain = global.filter((i) => i.Email == postData.Email)
-
             if (haveMain.length == 0 || haveMain[0].Email !== postData.Email) {
-                // fetch("https://main--automailsender.netlify.app/api/mail/", {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                //     body: JSON.stringify(postData),
-                // })
-                //     .then(response => response.json())
-                //     .then(data => {
-                //         console.log('Response from backend:', data);
-                //     })
-                //     .catch(error => {
-                //         console.error('Error:', error);
-                //     });
-
-                post(postData);
+                await axios.post("http://localhost:3000/api/mail/", postData).then((response) => {
+                    console.log("qr response", JSON.stringify(response));
+                    return response;
+                }).catch((error) => { console.log("error:", error.response); });
                 global.push(userEmail)
             }
         }
     } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error(error);
     }
-});
-// export default function handler(req, res) {
-//     res.status(200).end();
-// }
-
+})
